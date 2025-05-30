@@ -1,11 +1,11 @@
 #include "CTBot.h"
+#include <ESP8266WiFi.h>
 CTBot myBot;
 
 //Definicoes da rede wifi e conexao
 String ssid  = "nome da rede"; //Nome da sua rede wifi
 String pass  = "senha da rede"; //Senha da sua rede wifi
-
-String token = "7258**********************************fDTs7H4"; //Token bot Telegram
+String token = "72585497**************************7H4"; //Coloque seu token aqui
 
 //Pinos dos leds
 uint8_t led1 = D4;
@@ -14,19 +14,35 @@ uint8_t led2 = D3;
 void setup()
 {
   Serial.begin(115200);
+  delay (1000);
   Serial.println("Inicializando bot Telegram...");
 
-  //Conexao na rede wifi
-  myBot.wifiConnect(ssid, pass);
+  Serial.print("Conectando-se à rede: ");
+  Serial.println(ssid);
+  WiFi.begin(ssid,pass);
+
+  int tentativas = 0;
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+    tentativas++;
+    if (tentativas > 40) { // timeout de 20 segundos
+      Serial.println("\nFalha ao conectar-se ao Wi-Fi");
+      return;
+    }
+  }
+  Serial.println("\nWi-Fi conectado com sucesso!");
+  Serial.print("Endereço IP: ");
+  Serial.println(WiFi.localIP());  
 
   //Define o token
   myBot.setTelegramToken(token);
 
   //Verifica a conexao
   if (myBot.testConnection())
-    Serial.println("nConexao Ok!");
+    Serial.println("\nConexao Ok!");
   else
-    Serial.println("nFalha na conexao!");
+    Serial.println("\nFalha na conexao!");
 
   //Define os pinos dos leds como saida e apaga os leds
   pinMode(led1, OUTPUT);
